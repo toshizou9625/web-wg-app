@@ -1,10 +1,15 @@
 <template>
-  <nav class="w-80 bg-md-surface-container h-screen overflow-y-auto border-r border-md-outline-variant shadow-md-elevation-1">
+  <nav
+    class="w-80 bg-md-surface-container h-screen overflow-y-auto border-r border-md-outline-variant shadow-md-elevation-1 fixed lg:static top-0 left-0 z-40 transition-transform duration-300"
+    :class="{
+      '-translate-x-full lg:translate-x-0': !isMobileOpen,
+      'translate-x-0': isMobileOpen
+    }"
+  >
     <div class="p-6">
       <!-- App Title -->
       <div class="mb-8">
-        <h1 class="text-md-headline-small font-medium text-md-on-surface">WebWG Vue</h1>
-        <p class="text-md-body-small text-md-on-surface-variant mt-1">Vue.js 学習管理アプリ</p>
+        <h1 class="text-md-headline-small font-medium text-md-on-surface">WebWG 学習管理アプリ</h1>
       </div>
       
       <!-- Primary Navigation -->
@@ -12,9 +17,10 @@
         <div class="space-y-2">
           <router-link
             to="/"
+            @click="$emit('close')"
             class="flex items-center px-4 py-3 rounded-md-lg transition-all duration-200 text-md-label-large"
-            :class="$route.name === 'dashboard' ? 
-              'bg-md-secondary-container text-md-on-secondary-container' : 
+            :class="$route.name === 'dashboard' ?
+              'bg-md-secondary-container text-md-on-secondary-container' :
               'text-md-on-surface hover:bg-md-on-surface/8 active:bg-md-on-surface/12'"
           >
             <span class="w-6 h-6 mr-3 flex items-center justify-center text-lg">📊</span>
@@ -23,9 +29,10 @@
 
           <router-link
             to="/calendar"
+            @click="$emit('close')"
             class="flex items-center px-4 py-3 rounded-md-lg transition-all duration-200 text-md-label-large"
-            :class="$route.name === 'calendar' ? 
-              'bg-md-secondary-container text-md-on-secondary-container' : 
+            :class="$route.name === 'calendar' ?
+              'bg-md-secondary-container text-md-on-secondary-container' :
               'text-md-on-surface hover:bg-md-on-surface/8 active:bg-md-on-surface/12'"
           >
             <span class="w-6 h-6 mr-3 flex items-center justify-center text-lg">📅</span>
@@ -60,9 +67,10 @@
           >
             <router-link
               :to="`/section/${section.id}`"
+              @click="$emit('close')"
               class="flex items-center justify-between px-4 py-3 rounded-md-lg transition-all duration-200 text-md-body-medium"
-              :class="currentSectionId === section.id ? 
-                'bg-md-secondary-container text-md-on-secondary-container' : 
+              :class="currentSectionId === section.id ?
+                'bg-md-secondary-container text-md-on-secondary-container' :
                 'text-md-on-surface hover:bg-md-on-surface/8 active:bg-md-on-surface/12'"
             >
               <div class="flex items-center min-w-0 flex-1">
@@ -100,13 +108,21 @@ import { computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useSectionsStore } from '@/stores/sections'
 
+defineProps<{
+  isMobileOpen: boolean
+}>()
+
+defineEmits<{
+  close: []
+}>()
+
 const router = useRouter()
 const sectionsStore = useSectionsStore()
 
 const sections = computed(() => sectionsStore.sections)
 const currentSectionId = computed(() => sectionsStore.currentSectionId)
 
-async function addNewSection() {
+const addNewSection = async () => {
   try {
     const section = await sectionsStore.addSection('新しい学習セクション')
     router.push(`/section/${section.id}`)
@@ -115,18 +131,17 @@ async function addNewSection() {
   }
 }
 
-async function deleteSection(sectionId: string) {
-  if (confirm('このセクションを削除しますか？')) {
-    try {
-      await sectionsStore.deleteSection(sectionId)
-    } catch (error) {
-      console.error('Failed to delete section:', error)
-      alert('削除に失敗しました。もう一度お試しください。')
-    }
+const deleteSection = async (sectionId: string) => {
+  if (!confirm('このセクションを削除しますか？')) return
+
+  try {
+    await sectionsStore.deleteSection(sectionId)
+  } catch (error) {
+    console.error('Failed to delete section:', error)
+    alert('削除に失敗しました。もう一度お試しください。')
   }
 }
 
-// ナビゲーション初期化時にFirebaseからセクションデータを取得
 onMounted(async () => {
   try {
     await sectionsStore.initializeFromFirebase()

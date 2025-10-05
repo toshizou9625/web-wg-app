@@ -1,5 +1,5 @@
 <template>
-  <div class="p-6 bg-md-surface-bright min-h-screen">
+  <div class="p-4 sm:p-6 bg-md-surface-bright min-h-screen pt-20 lg:pt-6">
     <!-- Loading State -->
     <LoadingSpinner 
       v-if="isInitializing" 
@@ -11,12 +11,12 @@
     
     <!-- Page Header -->
     <div class="mb-8">
-      <h1 class="text-md-display-small font-normal text-md-on-surface mb-2">ダッシュボード</h1>
-      <p class="text-md-body-large text-md-on-surface-variant">Web WG グループワークの学習内容とスケジュールを管理</p>
+      <h1 class="text-md-headline-medium sm:text-md-display-small font-normal text-md-on-surface mb-2">ダッシュボード</h1>
+      <p class="text-md-body-medium sm:text-md-body-large text-md-on-surface-variant">Web WG グループワークの学習内容とスケジュールを管理</p>
     </div>
 
     <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-8">
       <div class="bg-md-surface-container rounded-md-xl shadow-md-elevation-1 p-6 border border-md-outline-variant">
         <div class="flex items-center">
           <div class="w-12 h-12 rounded-md-lg bg-md-primary-container text-md-on-primary-container flex items-center justify-center">
@@ -59,14 +59,14 @@
           <div
             v-for="section in recentSections"
             :key="section.id"
-            class="flex items-center justify-between p-4 rounded-md-lg hover:bg-md-on-surface/8 transition-all duration-200"
+            class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 rounded-md-lg hover:bg-md-on-surface/8 transition-all duration-200"
           >
             <div class="flex items-center min-w-0 flex-1">
-              <div class="w-10 h-10 mr-4 rounded-md-lg bg-md-primary-container text-md-on-primary-container flex items-center justify-center">
+              <div class="w-10 h-10 mr-3 sm:mr-4 rounded-md-lg bg-md-primary-container text-md-on-primary-container flex items-center justify-center flex-shrink-0">
                 <span class="text-lg">📝</span>
               </div>
               <div class="min-w-0 flex-1">
-                <h3 class="text-md-title-medium text-md-on-surface font-medium truncate">{{ section.title }}</h3>
+                <h3 class="text-md-title-small sm:text-md-title-medium text-md-on-surface font-medium truncate">{{ section.title }}</h3>
                 <p class="text-md-body-small text-md-on-surface-variant">
                   学習セクション • {{ formatDate(section.updatedAt) }}
                 </p>
@@ -74,7 +74,7 @@
             </div>
             <router-link
               :to="`/section/${section.id}`"
-              class="ml-4 px-6 py-2 bg-md-primary text-md-on-primary rounded-md-full hover:shadow-md-elevation-2 transition-all duration-200 text-md-label-large font-medium"
+              class="w-full sm:w-auto sm:ml-4 px-6 py-2 bg-md-primary text-md-on-primary rounded-md-full hover:shadow-md-elevation-2 transition-all duration-200 text-md-label-large font-medium text-center"
             >
               開く
             </router-link>
@@ -88,34 +88,34 @@
       <div class="px-6 py-4">
         <h2 class="text-md-title-large font-normal text-md-on-surface">クイックアクション</h2>
       </div>
-      <div class="px-6 pb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="px-4 sm:px-6 pb-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <LoadingButton
             @click="createNewSection"
             :loading="sectionsStore.isLoading"
             text="新しいセクション作成"
             loading-text="作成中..."
             variant="primary"
-            class="flex items-center p-6 border-2 border-dashed border-md-outline rounded-md-xl hover:border-md-primary hover:bg-md-primary-container/20 transition-all duration-200 group w-full"
+            class="flex items-center p-4 sm:p-6 border-2 border-dashed border-md-outline rounded-md-xl hover:border-md-primary hover:bg-md-primary-container/20 transition-all duration-200 group w-full"
           >
-            <div class="w-12 h-12 mr-4 rounded-md-lg bg-md-primary-container text-md-on-primary-container flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-              <span class="text-xl">📝</span>
+            <div class="w-10 h-10 sm:w-12 sm:h-12 mr-3 sm:mr-4 rounded-md-lg bg-md-primary-container text-md-on-primary-container flex items-center justify-center group-hover:scale-110 transition-transform duration-200 flex-shrink-0">
+              <span class="text-lg sm:text-xl">📝</span>
             </div>
             <div class="text-left">
-              <p class="text-md-title-medium font-medium text-md-on-surface">新しいセクション作成</p>
+              <p class="text-md-title-small sm:text-md-title-medium font-medium text-md-on-surface">新しいセクション作成</p>
               <p class="text-md-body-small text-md-on-surface-variant">学習コンテンツと振り返りを追加</p>
             </div>
           </LoadingButton>
 
           <router-link
             to="/calendar"
-            class="flex items-center p-6 border-2 border-dashed border-md-outline rounded-md-xl hover:border-md-tertiary hover:bg-md-tertiary-container/20 transition-all duration-200 group"
+            class="flex items-center p-4 sm:p-6 border-2 border-dashed border-md-outline rounded-md-xl hover:border-md-tertiary hover:bg-md-tertiary-container/20 transition-all duration-200 group"
           >
-            <div class="w-12 h-12 mr-4 rounded-md-lg bg-md-tertiary-container text-md-on-tertiary-container flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
-              <span class="text-xl">📅</span>
+            <div class="w-10 h-10 sm:w-12 sm:h-12 mr-3 sm:mr-4 rounded-md-lg bg-md-tertiary-container text-md-on-tertiary-container flex items-center justify-center group-hover:scale-110 transition-transform duration-200 flex-shrink-0">
+              <span class="text-lg sm:text-xl">📅</span>
             </div>
             <div class="text-left">
-              <p class="text-md-title-medium font-medium text-md-on-surface">カレンダーを開く</p>
+              <p class="text-md-title-small sm:text-md-title-medium font-medium text-md-on-surface">カレンダーを開く</p>
               <p class="text-md-body-small text-md-on-surface-variant">予定を確認・編集</p>
             </div>
           </router-link>
