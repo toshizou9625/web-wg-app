@@ -12,10 +12,12 @@
           var q = {};
           l.search.slice(1).split('&').forEach(function (v) {
             var a = v.split('=');
-            q[a[0]] = a[1];
+            q[a[0]] = a.slice(1).join('=');
           });
           if (q.p !== undefined) {
-            window.history.replaceState(null, null, q.p || '/');
+            // URLデコードして元のパスを復元
+            var path = decodeURIComponent(q.p);
+            window.history.replaceState(null, null, path || '/');
           }
         }
       }(window.location));

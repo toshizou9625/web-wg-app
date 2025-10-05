@@ -4,11 +4,10 @@
     <meta charset="UTF-8" />
     <script>
       // GitHub Pages SPAのための404リダイレクト処理
-      let l = window.location;
-      let port = l.port ? ':' + l.port : '';
-      l.replace(
-        `${l.protocol}//${l.hostname}${port}${l.pathname}`
-      );
+      let l = window.location
+      let port = l.port ? ':' + l.port : ''
+      // /web-wg-app/calendar -> /?p=/web-wg-app/calendar
+      l.replace(`${l.protocol}//${l.hostname}${port}?p=${l.pathname}`)
     </script>
   </head>
   <body></body>
