@@ -5,8 +5,6 @@ import { calendarEventService } from '@/services/firestore'
 
 export const useCalendarStore = defineStore('calendar', () => {
   const events = ref<CalendarEvent[]>([])
-  
-  // ローディング状態
   const isLoading = ref(false)
   const isSaving = ref(false)
   const isDeleting = ref(false)
@@ -15,9 +13,7 @@ export const useCalendarStore = defineStore('calendar', () => {
   const eventsByDate = computed(() => {
     const groupedEvents: Record<string, CalendarEvent[]> = {}
     events.value.forEach(event => {
-      if (!groupedEvents[event.date]) {
-        groupedEvents[event.date] = []
-      }
+      if (!groupedEvents[event.date]) groupedEvents[event.date] = []
       groupedEvents[event.date].push(event)
     })
     return groupedEvents
@@ -26,15 +22,9 @@ export const useCalendarStore = defineStore('calendar', () => {
   async function addEvent(date: string, title: string, memo: string = '') {
     isLoading.value = true
     const now = new Date()
-    const event = {
-      date,
-      title,
-      memo,
-      createdAt: now,
-      updatedAt: now
-    }
-    
+
     try {
+      const event = { date, title, memo, createdAt: now, updatedAt: now }
       const eventId = await calendarEventService.create(event)
       const eventWithId = { ...event, id: eventId }
       events.value.push(eventWithId)
@@ -52,13 +42,10 @@ export const useCalendarStore = defineStore('calendar', () => {
     try {
       const updatedData = { ...updates, updatedAt: new Date() }
       await calendarEventService.update(eventId, updatedData)
-      
+
       const index = events.value.findIndex(e => e.id === eventId)
       if (index !== -1) {
-        events.value[index] = {
-          ...events.value[index],
-          ...updatedData
-        }
+        events.value[index] = { ...events.value[index], ...updatedData }
       }
     } catch (error) {
       console.error('Failed to update event:', error)
@@ -72,10 +59,7 @@ export const useCalendarStore = defineStore('calendar', () => {
     isDeleting.value = true
     try {
       await calendarEventService.delete(eventId)
-      const index = events.value.findIndex(e => e.id === eventId)
-      if (index !== -1) {
-        events.value.splice(index, 1)
-      }
+      events.value = events.value.filter(e => e.id !== eventId)
     } catch (error) {
       console.error('Failed to delete event:', error)
       throw error
@@ -84,17 +68,13 @@ export const useCalendarStore = defineStore('calendar', () => {
     }
   }
 
-  function getEventsForDate(date: string) {
-    return events.value.filter(event => event.date === date)
-  }
+  const getEventsForDate = (date: string) => events.value.filter(event => event.date === date)
 
-  // Firebase からすべてのカレンダーイベントを取得する初期化関数
   async function initializeFromFirebase() {
     isInitializing.value = true
     try {
-      const eventsList = await calendarEventService.getAll()
-      events.value = eventsList
-      console.log('Calendar events loaded from Firebase:', eventsList.length)
+      events.value = await calendarEventService.getAll()
+      console.log('Calendar events loaded from Firebase:', events.value.length)
     } catch (error) {
       console.error('Failed to load calendar events from Firebase:', error)
       throw error

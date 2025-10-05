@@ -15,6 +15,7 @@ export interface ContentSection {
   details: string
   assignments: string[]
   memo: string
+  memos: { date: string; content: string }[]
   createdAt: Date
   updatedAt: Date
 }
@@ -22,9 +23,9 @@ export interface ContentSection {
 export interface ReflectionSection {
   id: string
   sectionId: string
-  rating: number
-  goodPoints: string
-  improvementPoints: string
+  keep: string
+  problem: string
+  try: string
   memo: string
   teamMembers?: TeamMemberReflection[]
   createdAt: Date

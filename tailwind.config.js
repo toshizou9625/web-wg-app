@@ -175,5 +175,10 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('@tailwindcss/typography'),
+  ],
+  // Typography プラグインのカスタマイズ
+  safelist: ['prose', 'prose-sm'],
 }
