@@ -17,6 +17,11 @@
           if (q.p !== undefined) {
             // URLデコードして元のパスを復元
             var path = decodeURIComponent(q.p);
+            // ベースパス(/web-wg-app/)を除去
+            var basePath = '/web-wg-app/';
+            if (path.startsWith(basePath)) {
+              path = path.substring(basePath.length - 1);
+            }
             window.history.replaceState(null, null, path || '/');
           }
         }
