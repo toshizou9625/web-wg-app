@@ -623,21 +623,21 @@ async function saveSection() {
   try {
     // コンテンツデータを保存
     await sectionsStore.updateContentSection(currentSection.value.id, {
-      title: contentData.title,
-      assignee: contentData.assignee,
-      motivation: contentData.motivation,
-      details: contentData.details,
+      title: contentData.title || '',
+      assignee: contentData.assignee || '',
+      motivation: contentData.motivation || '',
+      details: contentData.details || '',
       assignments: contentData.assignments.filter((a) => a.trim() !== ''),
-      memo: contentData.memo,
+      memo: contentData.memo || '',
       memos: contentData.memos,
     })
 
     // 振り返りデータを保存（チームメンバーデータも含む）
     await sectionsStore.updateReflectionSection(currentSection.value.id, {
-      keep: reflectionData.keep,
-      problem: reflectionData.problem,
-      try: reflectionData.try,
-      memo: reflectionData.memo,
+      keep: reflectionData.keep || '',
+      problem: reflectionData.problem || '',
+      try: reflectionData.try || '',
+      memo: reflectionData.memo || '',
       teamMembers: teamMembers.value,
     })
 
@@ -651,19 +651,19 @@ async function saveSection() {
 // データ読み込み
 function loadContentData() {
   if (currentContentSection.value) {
-    contentData.title = currentSection.value?.title || currentContentSection.value.title
-    contentData.assignee = currentContentSection.value.assignee
-    contentData.motivation = currentContentSection.value.motivation
-    contentData.details = currentContentSection.value.details
+    contentData.title = currentSection.value?.title || currentContentSection.value.title || ''
+    contentData.assignee = currentContentSection.value.assignee || ''
+    contentData.motivation = currentContentSection.value.motivation || ''
+    contentData.details = currentContentSection.value.details || ''
     contentData.assignments = currentContentSection.value.assignments.length > 0
       ? [...currentContentSection.value.assignments]
       : ['']
-    contentData.memo = currentContentSection.value.memo
+    contentData.memo = currentContentSection.value.memo || ''
     contentData.memos = currentContentSection.value.memos?.length > 0
       ? [...currentContentSection.value.memos]
       : [{ date: '', content: '' }]
   } else if (currentSection.value) {
-    contentData.title = currentSection.value.title
+    contentData.title = currentSection.value.title || ''
   }
 
   nextTick(() => {
@@ -674,10 +674,10 @@ function loadContentData() {
 function loadReflectionData() {
   if (currentReflectionSection.value) {
     Object.assign(reflectionData, {
-      keep: currentReflectionSection.value.keep,
-      problem: currentReflectionSection.value.problem,
-      try: currentReflectionSection.value.try,
-      memo: currentReflectionSection.value.memo,
+      keep: currentReflectionSection.value.keep || '',
+      problem: currentReflectionSection.value.problem || '',
+      try: currentReflectionSection.value.try || '',
+      memo: currentReflectionSection.value.memo || '',
     })
     teamMembers.value = currentReflectionSection.value.teamMembers
       ? [...currentReflectionSection.value.teamMembers]
