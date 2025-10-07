@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.0
+
+- TopViewを追加（Firebase認証）
+- SectionViewのエラー修正
+
 ## v1.1.0
 
 - 学習セクションページの表示、入力内容を修正

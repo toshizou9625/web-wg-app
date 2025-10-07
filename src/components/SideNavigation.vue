@@ -16,7 +16,7 @@
       <div class="mb-8">
         <div class="space-y-2">
           <router-link
-            to="/"
+            to="/dashboard"
             @click="$emit('close')"
             class="flex items-center px-4 py-3 rounded-md-lg transition-all duration-200 text-md-label-large"
             :class="$route.name === 'dashboard' ?

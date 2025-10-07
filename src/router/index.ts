@@ -5,6 +5,12 @@ const router = createRouter({
   routes: [
     {
       path: '/',
+      name: 'top',
+      component: () => import('../views/TopView.vue'),
+      meta: { hideNavigation: true }
+    },
+    {
+      path: '/dashboard',
       name: 'dashboard',
       component: () => import('../views/DashboardView.vue'),
     },
