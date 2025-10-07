@@ -89,7 +89,8 @@
             モチベーション
           </label>
           <textarea
-            v-model="contentData.motivation"
+            ref="motivationTextarea"
+            v-model="motivationInput"
             class="w-full p-4 border border-md-outline rounded-md-xs focus:border-md-primary focus:outline-none bg-md-surface text-md-on-surface placeholder:text-md-on-surface-variant text-md-body-large resize-none min-h-[80px]"
             placeholder="この学習に取り組む理由や目標を入力"
           ></textarea>
@@ -103,7 +104,8 @@
             やること詳細
           </label>
           <textarea
-            v-model="contentData.details"
+            ref="detailsTextarea"
+            v-model="detailsInput"
             class="w-full p-4 border border-md-outline rounded-md-xs focus:border-md-primary focus:outline-none bg-md-surface text-md-on-surface placeholder:text-md-on-surface-variant text-md-body-large resize-none min-h-[120px]"
             placeholder="具体的な学習内容や手順を入力"
           ></textarea>
@@ -219,7 +221,8 @@
               Keep（継続したいこと）
             </label>
             <textarea
-              v-model="reflectionData.keep"
+              ref="keepTextarea"
+              v-model="keepInput"
               class="w-full p-4 border border-md-outline rounded-md-xs focus:border-md-primary focus:outline-none bg-md-surface text-md-on-surface placeholder:text-md-on-surface-variant text-md-body-large resize-none min-h-[100px]"
               placeholder="うまくいったことや継続したいことを記録..."
             ></textarea>
@@ -233,7 +236,8 @@
               Problem（問題点）
             </label>
             <textarea
-              v-model="reflectionData.problem"
+              ref="problemTextarea"
+              v-model="problemInput"
               class="w-full p-4 border border-md-outline rounded-md-xs focus:border-md-primary focus:outline-none bg-md-surface text-md-on-surface placeholder:text-md-on-surface-variant text-md-body-large resize-none min-h-[100px]"
               placeholder="課題や問題点を記録..."
             ></textarea>
@@ -247,7 +251,8 @@
               Try（次に挑戦すること）
             </label>
             <textarea
-              v-model="reflectionData.try"
+              ref="tryTextarea"
+              v-model="tryInput"
               class="w-full p-4 border border-md-outline rounded-md-xs focus:border-md-primary focus:outline-none bg-md-surface text-md-on-surface placeholder:text-md-on-surface-variant text-md-body-large resize-none min-h-[100px]"
               placeholder="次回試したいことや改善したいことを記録..."
             ></textarea>
@@ -415,7 +420,8 @@
             <div>
               <h3 class="text-md-label-medium text-md-on-surface-variant mb-3">編集</h3>
               <textarea
-                v-model="reflectionData.memo"
+                ref="reflectionMemoTextarea"
+                v-model="reflectionMemoInput"
                 class="w-full p-4 border border-md-outline rounded-md-xs focus:border-md-primary focus:outline-none bg-md-surface text-md-on-surface placeholder:text-md-on-surface-variant font-mono text-md-body-small resize-none min-h-[150px]"
                 placeholder="詳細な振り返りをマークダウン形式で入力..."
               ></textarea>
@@ -461,6 +467,7 @@ import { marked } from 'marked'
 import { format } from 'date-fns'
 import { ja } from 'date-fns/locale'
 import { Chart, registerables } from 'chart.js'
+import { useTextareaAutosize } from '@vueuse/core'
 
 // markedの設定
 marked.setOptions({
@@ -474,30 +481,28 @@ const route = useRoute()
 const sectionsStore = useSectionsStore()
 const chartCanvas = ref<HTMLCanvasElement>()
 
-// メモ用のtextarea refs
-const memoTextareas = ref<Map<number, HTMLTextAreaElement>>(new Map())
-
 const currentSection = computed(() => sectionsStore.currentSection)
 const currentContentSection = computed(() => sectionsStore.currentContentSection)
 const currentReflectionSection = computed(() => sectionsStore.currentReflectionSection)
+
+// Autosizeのtextarea（inputの値も一緒に管理）
+const { textarea: motivationTextarea, input: motivationInput } = useTextareaAutosize()
+const { textarea: detailsTextarea, input: detailsInput } = useTextareaAutosize()
+const { textarea: keepTextarea, input: keepInput } = useTextareaAutosize()
+const { textarea: problemTextarea, input: problemInput } = useTextareaAutosize()
+const { textarea: tryTextarea, input: tryInput } = useTextareaAutosize()
+const { textarea: reflectionMemoTextarea, input: reflectionMemoInput } = useTextareaAutosize()
+
+// メモ用のtextarea refs
+const memoTextareas = ref<Map<number, HTMLTextAreaElement>>(new Map())
 
 // コンテンツデータ
 const contentData = reactive({
   title: '',
   assignee: '',
-  motivation: '',
-  details: '',
   assignments: [''],
   memo: '',
   memos: [{ date: '', content: '' }],
-})
-
-// 振り返りデータ
-const reflectionData = reactive({
-  keep: '',
-  problem: '',
-  try: '',
-  memo: '',
 })
 
 const teamMembers = ref<TeamMemberReflection[]>([])
@@ -520,7 +525,7 @@ const allImprovementPoints = computed(() => {
 
 const reflectionMarkdownPreview = computed(() => {
   try {
-    return marked(reflectionData.memo || '')
+    return marked(reflectionMemoInput.value || '')
   } catch {
     return '<p class="text-red-500">マークダウンの解析エラー</p>'
   }
@@ -625,8 +630,8 @@ async function saveSection() {
     await sectionsStore.updateContentSection(currentSection.value.id, {
       title: contentData.title || '',
       assignee: contentData.assignee || '',
-      motivation: contentData.motivation || '',
-      details: contentData.details || '',
+      motivation: motivationInput.value || '',
+      details: detailsInput.value || '',
       assignments: contentData.assignments.filter((a) => a.trim() !== ''),
       memo: contentData.memo || '',
       memos: contentData.memos,
@@ -634,10 +639,10 @@ async function saveSection() {
 
     // 振り返りデータを保存（チームメンバーデータも含む）
     await sectionsStore.updateReflectionSection(currentSection.value.id, {
-      keep: reflectionData.keep || '',
-      problem: reflectionData.problem || '',
-      try: reflectionData.try || '',
-      memo: reflectionData.memo || '',
+      keep: keepInput.value || '',
+      problem: problemInput.value || '',
+      try: tryInput.value || '',
+      memo: reflectionMemoInput.value || '',
       teamMembers: teamMembers.value,
     })
 
@@ -653,8 +658,8 @@ function loadContentData() {
   if (currentContentSection.value) {
     contentData.title = currentSection.value?.title || currentContentSection.value.title || ''
     contentData.assignee = currentContentSection.value.assignee || ''
-    contentData.motivation = currentContentSection.value.motivation || ''
-    contentData.details = currentContentSection.value.details || ''
+    motivationInput.value = currentContentSection.value.motivation || ''
+    detailsInput.value = currentContentSection.value.details || ''
     contentData.assignments = currentContentSection.value.assignments.length > 0
       ? [...currentContentSection.value.assignments]
       : ['']
@@ -673,12 +678,10 @@ function loadContentData() {
 
 function loadReflectionData() {
   if (currentReflectionSection.value) {
-    Object.assign(reflectionData, {
-      keep: currentReflectionSection.value.keep || '',
-      problem: currentReflectionSection.value.problem || '',
-      try: currentReflectionSection.value.try || '',
-      memo: currentReflectionSection.value.memo || '',
-    })
+    keepInput.value = currentReflectionSection.value.keep || ''
+    problemInput.value = currentReflectionSection.value.problem || ''
+    tryInput.value = currentReflectionSection.value.try || ''
+    reflectionMemoInput.value = currentReflectionSection.value.memo || ''
     teamMembers.value = currentReflectionSection.value.teamMembers
       ? [...currentReflectionSection.value.teamMembers]
       : []

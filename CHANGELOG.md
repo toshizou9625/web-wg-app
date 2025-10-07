@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.1
+
+- 認証していない場合のルートガード実装を追加
+- TextAreaのデグレを修正
+
 ## v1.2.0
 
 - TopViewを追加（Firebase認証）

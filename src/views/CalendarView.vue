@@ -1,14 +1,14 @@
 <template>
   <div class="p-4 sm:p-6 bg-md-surface-bright min-h-screen pt-20 lg:pt-6">
     <!-- Loading State -->
-    <LoadingSpinner 
-      v-if="calendarStore.isInitializing" 
-      overlay 
-      fullscreen 
+    <LoadingSpinner
+      v-if="calendarStore.isInitializing"
+      overlay
+      fullscreen
       text="カレンダーデータを読み込み中..."
       show-text
     />
-    
+
     <div class="mb-8">
       <h1 class="text-md-headline-medium sm:text-md-display-small font-normal text-md-on-surface mb-2">カレンダー</h1>
       <p class="text-md-body-medium sm:text-md-body-large text-md-on-surface-variant">スケジュールと予定を管理</p>
@@ -148,7 +148,8 @@
                 メモ
               </label>
               <textarea
-                v-model="eventForm.memo"
+                ref="memoTextarea"
+                v-model="memoInput"
                 rows="3"
                 class="w-full p-3 border border-md-outline rounded-md-xs focus:border-md-primary focus:outline-none bg-md-surface text-md-on-surface placeholder:text-md-on-surface-variant text-md-body-large resize-none"
                 placeholder="詳細やメモを入力（任意）"
@@ -291,6 +292,7 @@ import {
 import { ja } from 'date-fns/locale'
 import LoadingSpinner from '@/components/LoadingSpinner.vue'
 import LoadingButton from '@/components/LoadingButton.vue'
+import { useTextareaAutosize } from '@vueuse/core'
 
 const calendarStore = useCalendarStore()
 
@@ -298,10 +300,12 @@ const currentDate = ref(new Date())
 const selectedDate = ref(new Date())
 const editingEvent = ref<CalendarEvent | null>(null)
 
+// Autosizeのtextareaリファレンス
+const { textarea: memoTextarea, input: memoInput } = useTextareaAutosize()
+
 const eventForm = reactive({
   date: '',
   title: '',
-  memo: '',
 })
 
 const dayNames = ['日', '月', '火', '水', '木', '金', '土']
@@ -352,7 +356,7 @@ const goToToday = () => {
 
 const resetForm = () => {
   eventForm.title = ''
-  eventForm.memo = ''
+  memoInput.value = ''
   eventForm.date = format(selectedDate.value, 'yyyy-MM-dd')
 }
 
@@ -363,11 +367,11 @@ const saveEvent = () => {
     calendarStore.updateEvent(editingEvent.value.id, {
       date: eventForm.date,
       title: eventForm.title.trim(),
-      memo: eventForm.memo.trim(),
+      memo: memoInput.value.trim(),
     })
     editingEvent.value = null
   } else {
-    calendarStore.addEvent(eventForm.date, eventForm.title.trim(), eventForm.memo.trim())
+    calendarStore.addEvent(eventForm.date, eventForm.title.trim(), memoInput.value.trim())
   }
   resetForm()
 }
@@ -376,7 +380,7 @@ const editEvent = (event: CalendarEvent) => {
   editingEvent.value = event
   eventForm.date = event.date
   eventForm.title = event.title
-  eventForm.memo = event.memo
+  memoInput.value = event.memo
 }
 
 const deleteCurrentEvent = () => {
